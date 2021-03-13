@@ -14,6 +14,12 @@
     "categories": {
       "auth": {
         "postagramca872e5b": {}
+      },
+      "function": {
+        "S3Triggera2847b08": {
+          "deploymentBucketName": "amplify-postagram-dev-195026-deployment",
+          "s3Key": "amplify-builds/S3Triggera2847b08-51666f65365543367934-build.zip"
+        }
       }
     }
   }

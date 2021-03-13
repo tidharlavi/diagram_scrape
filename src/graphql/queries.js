@@ -36,3 +36,33 @@ export const listPosts = /* GraphQL */ `
     }
   }
 `;
+export const searchPosts = /* GraphQL */ `
+  query SearchPosts(
+    $filter: SearchablePostFilterInput
+    $sort: SearchablePostSortInput
+    $limit: Int
+    $nextToken: String
+    $from: Int
+  ) {
+    searchPosts(
+      filter: $filter
+      sort: $sort
+      limit: $limit
+      nextToken: $nextToken
+      from: $from
+    ) {
+      items {
+        id
+        name
+        location
+        description
+        image
+        owner
+        createdAt
+        updatedAt
+      }
+      nextToken
+      total
+    }
+  }
+`;

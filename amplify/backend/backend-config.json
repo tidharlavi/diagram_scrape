@@ -8,7 +8,7 @@
           "defaultAuthentication": {
             "authenticationType": "API_KEY",
             "apiKeyConfig": {
-              "apiKeyExpirationDays": 9,
+              "apiKeyExpirationDays": 300,
               "description": "public"
             }
           },
@@ -35,7 +35,9 @@
   "storage": {
     "images": {
       "service": "S3",
-      "providerPlugin": "awscloudformation"
+      "providerPlugin": "awscloudformation",
+      "dependsOn": []
     }
-  }
+  },
+  "function": {}
 }

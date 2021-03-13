@@ -7,13 +7,15 @@ import {
 import { withAuthenticator, AmplifySignOut } from '@aws-amplify/ui-react';
 import { css } from '@emotion/css';
 import { API, Storage, Auth } from 'aws-amplify';
-import { listPosts } from './graphql/queries';
+import { listPosts, searchPosts } from './graphql/queries';
+import { Input, Segment} from 'semantic-ui-react'
 
 import Posts from './Posts';
 import Post from './Post';
 import Header from './Header';
 import CreatePost from './CreatePost';
 import Button from './Button';
+
 
 function Router() {
   /* create a couple of pieces of initial state */
@@ -23,11 +25,16 @@ function Router() {
 
   /* fetch posts when component loads */
   useEffect(() => {
+      console.log('useEffect(): start')
       fetchPosts();
   }, []);
+
   async function fetchPosts() {
+    console.log('fetchPosts(): start')
     /* query the API, ask for 100 items */
     let postData = await API.graphql({ query: listPosts, variables: { limit: 100 }});
+    console.log('fetchPosts(): postData:')
+    console.log(postData)
     let postsArray = postData.data.listPosts.items;
     /* map over the image keys in the posts array, get signed image URLs for each image */
     postsArray = await Promise.all(postsArray.map(async post => {
@@ -38,8 +45,76 @@ function Router() {
     /* update the posts array in the local state */
     setPostState(postsArray);
   }
+
+  const Search = () => {
+    
+    const [photos, setPhotos] = useState([])
+    const [label, setLabel] = useState('')
+    const [hasResults, setHasResults] = useState(false)
+    const [searched, setSearched] = useState(false)
+  
+    const getPhotosForLabel = async (e) => {
+      console.log('getPhotosForLabel(): start')
+      /* query the API, ask for 100 items */
+      let postData = await API.graphql({ query: searchPosts, filter: {name: {match: label}}});
+      console.log('getPhotosForLabel(): postData:')
+      console.log(postData)
+      let postsArray = postData.data.searchPosts.items;
+      /* map over the image keys in the posts array, get signed image URLs for each image */
+      postsArray = await Promise.all(postsArray.map(async post => {
+        const imageKey = await Storage.get(post.image);
+        post.image = imageKey;
+        return post;
+      }));
+      /* update the posts array in the local state */
+      setPostState(postsArray);
+
+
+/*
+        setPhotos([])
+        const postData = await API.graphql({ query: searchPosts, filter: {name: {match: "zz"}}});
+        console.log("getPhotosForLabel(): postData: " + postData)
+        console.log(postData)
+        if (result.data.searchPosts.items.length !== 0) {
+            setHasResults(result.data.searchPhotos.items.length > 0)
+            setPhotos(p => p.concat(result.data.searchPhotos.items))
+        }
+        setSearched(true)
+        */
+    }
+  
+    const NoResults = () => {
+      return !searched
+        ? ''
+        : <Header as='h4' color='grey'>No photos found matching '{label}'</Header>
+    }
+  
+    return (
+        <Segment>
+          <Input
+            type='text'
+            placeholder='Search for photos'
+            icon='search'
+            iconPosition='left'
+            action={{ content: 'Search', onClick: getPhotosForLabel }}
+            name='label'
+            value={label}
+            onChange={(e) => { setLabel(e.target.value); setSearched(false);} }
+          />
+          {/*
+              hasResults
+              ? <PhotosList photos={photos} />
+              : <NoResults />*/
+          }
+        </Segment>
+    );
+  }
+  
+
   async function setPostState(postsArray) {
     const user = await Auth.currentAuthenticatedUser();
+    console.log('setPostState(): user:')
+    console.log(user)
     const myPostData = postsArray.filter(p => p.owner === user.username);
     updateMyPosts(myPostData);
     updatePosts(postsArray);
@@ -51,6 +126,7 @@ function Router() {
             <Header />
             <hr className={dividerStyle} />
             <Button title="New Post" onClick={() => updateOverlayVisibility(true)} />
+            <Route path="/" exact component={Search}/>
             <Switch>
               <Route exact path="/" >
                 <Posts posts={posts} />
@@ -85,4 +161,9 @@ const contentStyle = css`
   padding: 0px 40px;
 `
 
-export default withAuthenticator(Router);
+export default withAuthenticator(Router, {
+  includeGreetings: true,
+  signUpConfig: {
+    hiddenDefaults: ['phone_number']
+  }
+});

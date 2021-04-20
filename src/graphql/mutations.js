@@ -9,10 +9,15 @@ export const createPost = /* GraphQL */ `
     createPost(input: $input, condition: $condition) {
       id
       name
-      location
       description
       image
       owner
+      categories
+      industries
+      products
+      tags
+      link
+      sourcefile
       createdAt
       updatedAt
     }
@@ -26,10 +31,15 @@ export const updatePost = /* GraphQL */ `
     updatePost(input: $input, condition: $condition) {
       id
       name
-      location
       description
       image
       owner
+      categories
+      industries
+      products
+      tags
+      link
+      sourcefile
       createdAt
       updatedAt
     }
@@ -43,10 +53,15 @@ export const deletePost = /* GraphQL */ `
     deletePost(input: $input, condition: $condition) {
       id
       name
-      location
       description
       image
       owner
+      categories
+      industries
+      products
+      tags
+      link
+      sourcefile
       createdAt
       updatedAt
     }

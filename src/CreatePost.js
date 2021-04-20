@@ -3,6 +3,7 @@ import { css } from '@emotion/css';
 import Button from './Button';
 import { v4 as uuid } from 'uuid';
 import { Storage, API, Auth } from 'aws-amplify';
+import Analytics from '@aws-amplify/analytics';
 import { createPost } from './graphql/mutations';
 
 /* Initial state to hold form input, saving state */
@@ -11,7 +12,12 @@ const initialState = {
   description: '',
   image: {},
   file: '',
-  location: '',
+  link: '',
+  categories: null,
+  industries: null,
+  products: null,
+  tags: null,
+  sourcefile: '',
   saving: false
 };
 
@@ -38,18 +44,31 @@ export default function CreatePost({
   /* 4. Save the post  */
   async function save() {
     try {
-      const { name, description, location, image } = formState;
-      if (!name || !description || !location || !image.name) return;
+      var { name, description, link, image, categories, products, tags } = formState;
+      if (!name || !description || !image.name) return;
       updateFormState(currentState => ({ ...currentState, saving: true }));
       const postId = uuid();
-      const postInfo = { name, description, location, image: formState.image.name, id: postId };
+      const postInfo = { 
+        name, 
+        description, 
+        link, 
+        categories: categories.split(',').toString(), 
+        products: products.split(',').toString(), 
+        tags: tags.split(',').toString(), 
+        image: formState.image.name, 
+        id: postId 
+      };
+      console.log('createPost(), postInfo=', postInfo);
   
-      await Storage.put(formState.image.name, formState.image.fileInfo);
       await API.graphql({
         query: createPost,
         variables: { input: postInfo },
         authMode: 'AMAZON_COGNITO_USER_POOLS'
       }); // updated
+      await Storage.put(formState.image.name, formState.image.fileInfo, {metadata: postInfo});
+
+      Analytics.record({ name: 'create-post'});
+      
       const { username } = await Auth.currentAuthenticatedUser(); // new
       updatePosts([...posts, { ...postInfo, image: formState.file, owner: username }]); // updated
       updateFormState(currentState => ({ ...currentState, saving: false }));
@@ -62,20 +81,44 @@ export default function CreatePost({
   return (
     <div className={containerStyle}>
       <input
-        placeholder="Post name"
+        placeholder="Diagram name"
         name="name"
         className={inputStyle}
         onChange={onChangeText}
       />
       <input
-        placeholder="Location"
-        name="location"
+        placeholder="Link"
+        name="link"
         className={inputStyle}
         onChange={onChangeText}
       />
       <input
         placeholder="Description"
         name="description"
+        className={inputStyle}
+        onChange={onChangeText}
+      />
+      <input
+        placeholder="Categories"
+        name="categories"
+        className={inputStyle}
+        onChange={onChangeText}
+      />
+      <input
+        placeholder="Industries"
+        name="industries"
+        className={inputStyle}
+        onChange={onChangeText}
+      />
+      <input
+        placeholder="Products"
+        name="products"
+        className={inputStyle}
+        onChange={onChangeText}
+      />
+      <input
+        placeholder="Tags"
+        name="tags"
         className={inputStyle}
         onChange={onChangeText}
       />

@@ -1,14 +1,19 @@
 import React, { useState, useEffect } from "react";
-import {
-  HashRouter,
-  Switch,
-  Route
-} from "react-router-dom";
+import { HashRouter, Switch, Route } from "react-router-dom";
+
+import { Storage, Auth } from 'aws-amplify';
 import { withAuthenticator, AmplifySignOut } from '@aws-amplify/ui-react';
+import Analytics from '@aws-amplify/analytics';
+import { AuthState, onAuthUIStateChange } from '@aws-amplify/ui-components';
+import API, {graphqlOperation} from '@aws-amplify/api'
+
 import { css } from '@emotion/css';
-import { API, Storage, Auth } from 'aws-amplify';
+
 import { listPosts, searchPosts } from './graphql/queries';
+import * as queries from './graphql/queries'
 import { Input, Segment} from 'semantic-ui-react'
+import Select from 'react-select';
+import makeAnimated from 'react-select/animated';
 
 import Posts from './Posts';
 import Post from './Post';
@@ -16,6 +21,26 @@ import Header from './Header';
 import CreatePost from './CreatePost';
 import Button from './Button';
 
+const options = [
+  { value: 'Amazon EC2', label: 'Amazon EC2' },
+  { value: 'Amazon SNS', label: 'Amazon SNS' },
+  { value: 'AWS Lambda', label: 'AWS Lambda' }
+]
+
+Analytics.autoTrack('session', {
+  enable: true
+});
+
+Analytics.autoTrack('pageView', {
+  enable: true,
+  type: 'SPA'
+});
+
+Analytics.autoTrack('event', {
+  enable: true
+});
+
+const animatedComponents = makeAnimated();
 
 function Router() {
   /* create a couple of pieces of initial state */
@@ -23,9 +48,31 @@ function Router() {
   const [posts, updatePosts] = useState([]);
   const [myPosts, updateMyPosts] = useState([]);
 
+  const [authState, setAuthState] = React.useState();
+  const [user, setUser] = React.useState();
+
+  onAuthUIStateChange((nextAuthState, authData) => {
+    setAuthState(nextAuthState);
+    setUser(authData);
+
+    if (authData) {
+      const { email, sub } = authData.attributes;
+      Analytics.updateEndpoint({
+        address: email,
+        channelType: 'EMAIL',
+        optOut: 'NONE',
+        userId: sub,
+        userAttributes: {
+          username: [authData.username]
+        }
+      });
+    }
+  });
+
   /* fetch posts when component loads */
   useEffect(() => {
       console.log('useEffect(): start')
+
       fetchPosts();
   }, []);
 
@@ -46,18 +93,37 @@ function Router() {
     setPostState(postsArray);
   }
 
+  const AnimatedMulti = () => {
+    return (
+        <Select
+          closeMenuOnSelect={false}
+          components={animatedComponents}
+          defaultValue={[options[0]]}
+          isMulti
+          options={options}
+        />
+      );
+  }
+
   const Search = () => {
     
     const [photos, setPhotos] = useState([])
     const [label, setLabel] = useState('')
     const [hasResults, setHasResults] = useState(false)
     const [searched, setSearched] = useState(false)
+
+    Analytics.record({ name: 'perform-search', "label": label });
   
     const getPhotosForLabel = async (e) => {
-      console.log('getPhotosForLabel(): start')
+      console.log('getPhotosForLabel(): start. label=', label)
       /* query the API, ask for 100 items */
-      let postData = await API.graphql({ query: searchPosts, filter: {name: {match: label}}});
-      console.log('getPhotosForLabel(): postData:')
+      //let postData = await API.graphql({ query: searchPosts, filter: {products: {match: label}}});
+      //let postData = await API.graphql({ query: searchPosts, filter: {"match_phrase": {"products": label }}});
+      //let postData = await API.graphql({ query: searchPosts, filter: {products: {match: "Lambda"}}});
+
+      const postData = await API.graphql(graphqlOperation(queries.searchPosts, { filter: { products: { match: label }} }));
+
+      console.log('5 getPhotosForLabel(): postData:')
       console.log(postData)
       let postsArray = postData.data.searchPosts.items;
       /* map over the image keys in the posts array, get signed image URLs for each image */
@@ -127,6 +193,7 @@ function Router() {
             <hr className={dividerStyle} />
             <Button title="New Post" onClick={() => updateOverlayVisibility(true)} />
             <Route path="/" exact component={Search}/>
+            <Route path="/" exact component={AnimatedMulti}/>
             <Switch>
               <Route exact path="/" >
                 <Posts posts={posts} />

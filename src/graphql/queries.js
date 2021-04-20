@@ -6,10 +6,15 @@ export const getPost = /* GraphQL */ `
     getPost(id: $id) {
       id
       name
-      location
       description
       image
       owner
+      categories
+      industries
+      products
+      tags
+      link
+      sourcefile
       createdAt
       updatedAt
     }
@@ -25,10 +30,15 @@ export const listPosts = /* GraphQL */ `
       items {
         id
         name
-        location
         description
         image
         owner
+        categories
+        industries
+        products
+        tags
+        link
+        sourcefile
         createdAt
         updatedAt
       }
@@ -54,10 +64,15 @@ export const searchPosts = /* GraphQL */ `
       items {
         id
         name
-        location
         description
         image
         owner
+        categories
+        industries
+        products
+        tags
+        link
+        sourcefile
         createdAt
         updatedAt
       }

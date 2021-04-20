@@ -6,10 +6,15 @@ export const onCreatePost = /* GraphQL */ `
     onCreatePost {
       id
       name
-      location
       description
       image
       owner
+      categories
+      industries
+      products
+      tags
+      link
+      sourcefile
       createdAt
       updatedAt
     }
@@ -20,10 +25,15 @@ export const onUpdatePost = /* GraphQL */ `
     onUpdatePost {
       id
       name
-      location
       description
       image
       owner
+      categories
+      industries
+      products
+      tags
+      link
+      sourcefile
       createdAt
       updatedAt
     }
@@ -34,10 +44,15 @@ export const onDeletePost = /* GraphQL */ `
     onDeletePost {
       id
       name
-      location
       description
       image
       owner
+      categories
+      industries
+      products
+      tags
+      link
+      sourcefile
       createdAt
       updatedAt
     }

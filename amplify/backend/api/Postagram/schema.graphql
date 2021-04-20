@@ -7,8 +7,13 @@ type Post @model
   @searchable {
     id: ID!
     name: String!
-    location: String!
     description: String!
     image: String
     owner: String
+    categories: [String]
+    industries: [String]
+    products: [String]
+    tags: [String]
+    link: String
+    sourcefile: String
 }

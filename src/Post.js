@@ -4,6 +4,7 @@ import { useParams } from 'react-router-dom';
 import { API, Storage } from 'aws-amplify';
 import Analytics from '@aws-amplify/analytics';
 import { getPost } from './graphql/queries';
+import Button from './Button';
 
 export default function Post() {
   const [loading, updateLoading] = useState(true);
@@ -12,6 +13,39 @@ export default function Post() {
   useEffect(() => {
     fetchPost()
   }, [])
+
+
+  function downloadBlob(blob, filename) {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename || 'download';
+    const clickHandler = () => {
+      setTimeout(() => {
+        URL.revokeObjectURL(url);
+        a.removeEventListener('click', clickHandler);
+      }, 150);
+    };
+    a.addEventListener('click', clickHandler, false);
+    a.click();
+    return a;
+  }
+
+
+  async function downloadSourcefile() {
+    console.log('Going to download: post: ', post)
+    var result = await Storage.get(post.sourcefile, { download: true });
+    console.log('result: ', result," sourcefile: ", post.sourcefile)
+
+    var filename = post.sourcefile.split('.')[0]
+    var filefullExt = post.sourcefile.split('.')[1].split('_')[0]
+    var filenameFull = filename + '.' + filefullExt
+
+    console.log('filenameFull: ', filenameFull)
+
+    downloadBlob(result.Body, filenameFull);
+  }
+
   async function fetchPost() {
     try {
       const postData = await API.graphql({
@@ -54,7 +88,10 @@ export default function Post() {
       <h3 className={linkStyle}>Categories: {categoriesStr}</h3>
       <h3 className={linkStyle}>Products: {productsStr }</h3>
       <h3 className={linkStyle}>Tags: {tagsStr}</h3>
-      <h3 className={linkStyle}>Last updated: {post.updatedAt}</h3>
+      <h3 className={linkStyle}>Owner: {post.owner}</h3>
+      <h3 className={linkStyle}>Updated: {post.updatedAt}</h3>
+      <h3 className={linkStyle}>Created: {post.createdAt}</h3>
+      <Button title="Download Source File" onClick={() => downloadSourcefile(true)} />
       <p>Description: {post.description}</p>
       <img alt="post" src={post.image} className={imageStyle} />
     </>

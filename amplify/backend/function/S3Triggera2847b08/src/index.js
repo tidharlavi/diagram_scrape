@@ -23,12 +23,14 @@ const AUTH_TYPE = require('aws-appsync').AUTH_TYPE;
 const AWSAppSyncClient = require('aws-appsync').default;
 */
 
+require('isomorphic-fetch');
+
 const AWS = require('aws-sdk');
 const S3 = new AWS.S3({ signatureVersion: 'v4' });
 const Rekognition = new AWS.Rekognition();
-//const AWSAppSyncClient = require('aws-appsync').default;
-//const AUTH_TYPE = require('aws-appsync').AUTH_TYPE;
-//const gql = require('graphql-tag');
+const AWSAppSyncClient = require('aws-appsync').default;
+const AUTH_TYPE = require('aws-appsync').AUTH_TYPE;
+const gql = require('graphql-tag');
 
 const elasticsearch = require('elasticsearch')
 const awsHttpClient = require('http-aws-es')
@@ -45,8 +47,14 @@ var productsDict = {
   "redshift": "Amazon Redshift",
   "athena": "Amazon Athena",
   "sns": "Amazon Simple Notification Service",
-  "rekognition": "Amazon Rekognition"
+  "rekognition": "Amazon Rekognition",
+  "rds": "Amazon RDS",
+  "glue": "AWS Glue",
+  "spectrum": "Amazon Redshift Spectrum",
+  "formation": "AWS Lake Formation",
+  "eks": "Amazon EKS"
 }
+
 
 
 
@@ -77,17 +85,20 @@ async function getLabelNamesFromText(bucketName, key) {
     }
   };
   const detectionResult = await Rekognition.detectText(params).promise();
-  console.log('detectionResult:', JSON.stringify(detectionResult, null, 2));
+  //console.log('detectionResult:', JSON.stringify(detectionResult, null, 2));
   var textDetections = detectionResult['TextDetections'];
-  console.log('textDetections:', JSON.stringify(textDetections, null, 2));
+  //console.log('textDetections:', JSON.stringify(textDetections, null, 2));
   
-  const labelNames = [];
+  var labelNames = [];
+  var labelNamesDic = {};
   textDetections.forEach(function(textDetection) {
     //console.log('textDetection:', JSON.stringify(textDetection, null, 2));
-    //console.log(textDetection["DetectedText"] + ", " + textDetection["Type"]);
+    console.log(textDetection["DetectedText"] + ", " + textDetection["Type"]);
     if (textDetection["Type"] == "WORD") {
-      if (textDetection["DetectedText"].toLowerCase() in productsDict) {
-        labelNames.push(productsDict[textDetection["DetectedText"].toLowerCase()])
+      var word = textDetection["DetectedText"].toLowerCase();
+      if ((word in productsDict) && !(productsDict[word] in labelNamesDic)){
+        labelNames.push(productsDict[word])
+        labelNamesDic[productsDict[word]] = true
       }
     }
   });
@@ -110,7 +121,7 @@ exports.handler = async function(event, context, callback) {
 
   console.log('process.env:', JSON.stringify(process.env, null, 2));
   //console.log(`AUTH_TYPE.AWS_IAM: ${AUTH_TYPE.AWS_IAM}`);
-  console.log(`AWS.config: ${AWS.config}`);
+  console.log(`AWS.config: `, JSON.stringify(AWS.config, null, 2));
 
 /*
   client = new AWSAppSyncClient({
@@ -160,7 +171,7 @@ exports.handler = async function(event, context, callback) {
           credentials: AWS.config.credentials
       }
   });
-  
+  /*
   var result = await client.search({
       index: 'post',
       //type: 'post',
@@ -171,6 +182,8 @@ exports.handler = async function(event, context, callback) {
       }
   })
   console.log('result - match all', JSON.stringify(result))
+  */
+  
   
   var result = await client.search({
       index: 'post',
@@ -184,17 +197,17 @@ exports.handler = async function(event, context, callback) {
           }
       }
   })
-  console.log('result', JSON.stringify(result))
+  console.log('result', JSON.stringify(result, null, 2))
   var esId = result["hits"]["hits"][0]["_id"]
   console.log(`esId: ${esId}`);
   
-  const labelNames = await getLabelNames(bucket, key);
-  console.log("labelNames: ", labelNames)
+  //const labelNames = await getLabelNames(bucket, key);
+  //console.log("labelNames: ", labelNames)
   
   const labelNamesFromText = await getLabelNamesFromText(bucket, key);
   console.log("labelNamesFromText: ", labelNamesFromText)
   
-  
+  /*
   var sourceData = {
     doc: {
       products: labelNamesFromText
@@ -208,6 +221,8 @@ exports.handler = async function(event, context, callback) {
     body: sourceData
   };
   var result = await client.update(docParam, sourceData);
+*/
+
  /* 
   var result = await client.update({
       "_index": "post",
@@ -224,9 +239,9 @@ exports.handler = async function(event, context, callback) {
           name: "gxgxg"
       }
   })
-  */
-  console.log('result', JSON.stringify(result))
   
+  console.log('result', JSON.stringify(result))
+  */
   
   
   // call S3 to retrieve upload file to specified bucket
@@ -248,5 +263,42 @@ exports.handler = async function(event, context, callback) {
   }
   */
 
-  context.done(null, 'Successfully processed S3 event'); // SUCCESS with message
+  client = new AWSAppSyncClient({
+    url: process.env.API_POSTAGRAM_GRAPHQLAPIENDPOINTOUTPUT, //API_PHOTOALBUMS_GRAPHQLAPIENDPOINTOUTPUT, 
+    region: process.env.REGION,
+    auth: {
+      type: AUTH_TYPE.AWS_IAM,
+      credentials: AWS.config.credentials
+    },
+    disableOffline: true
+  });
+
+  const item = {
+    id: esId,
+    products: labelNamesFromText
+  }
+
+  console.log('storePhotoItem', JSON.stringify(item))
+  const updatePost = gql`
+    mutation UpdatePost(
+      $input: UpdatePostInput!
+    ) {
+      updatePost(input: $input) {
+        id
+        products
+      }
+    }
+  `;
+
+  console.log('trying to createphoto with input', JSON.stringify(item))
+  result = await client.mutate({ 
+      mutation: updatePost,
+      variables: { input: item },
+      fetchPolicy: 'no-cache'
+    })
+
+  console.log('result', JSON.stringify(result))
+
+  //context.done(null, 'Successfully processed S3 event'); // SUCCESS with message
+  console.log('Successfully processed S3 event')
 };

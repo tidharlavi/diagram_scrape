@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { css } from '@emotion/css';
 import Button from './Button';
 import { v4 as uuid } from 'uuid';
@@ -13,19 +13,22 @@ const initialState = {
   image: {},
   file: '',
   link: '',
-  categories: null,
-  industries: null,
-  products: null,
-  tags: null,
+  categories: [],
+  industries: [],
+  products: [],
+  tags: [],
   sourcefile: '',
   saving: false
 };
+
 
 export default function CreatePost({
   updateOverlayVisibility, updatePosts, posts
 }) {
   /* 1. Create local state with useState hook */
   const [formState, updateFormState] = useState(initialState)
+
+  const sourcefileInput = useRef(null)
 
   /* 2. onChangeText handler updates the form state when a user types into a form field */
   function onChangeText(e) {
@@ -36,36 +39,81 @@ export default function CreatePost({
   /* 3. onChangeFile handler will be fired when a user uploads a file  */
   function onChangeFile(e) {
     e.persist();
+    console.log("onChangeFile(), e.target.files=",e.target.files)
     if (! e.target.files[0]) return;
-    const image = { fileInfo: e.target.files[0], name: `${e.target.files[0].name}_${uuid()}`}
+    const image = { fileInfo: e.target.files[0], name: `${e.target.files[0].name}_${uuid()}_diagram`}
     updateFormState(currentState => ({ ...currentState, file: URL.createObjectURL(e.target.files[0]), image }))
+  }
+
+  function onChangeSourceFile(e) {
+    e.persist();
+    console.log("onChangeSourceFile(), e.target.files=",e.target.files)
+    if (! e.target.files[0]) return;
+    const sourcefile = { fileInfo: e.target.files[0], name: `${e.target.files[0].name}_${uuid()}_source`}
+    updateFormState(currentState => ({ ...currentState, sourcefile: URL.createObjectURL(e.target.files[0]), sourcefile }))
   }
 
   /* 4. Save the post  */
   async function save() {
     try {
-      var { name, description, link, image, categories, products, tags } = formState;
+      console.log('formState=', formState);
+      var { name, description, link, image, categories, industries, products, tags } = formState;
       if (!name || !description || !image.name) return;
+
+      //categories = !categories ? categories.split(',') : [] ;
+      console.log("categories=",categories)
+     /* if (!categories){
+        categories = [];
+      } else {
+        categories = categories.split(',');
+      }
+      console.log("categories=",categories)*/
+
+      //products = !products ? products.split(',') : [] ;
+      console.log("products=",products)
+      /*
+      if (!products){
+        products = [];
+      } else {
+        products = products.split(',');
+      }
+      console.log("products=",products)
+      */
+
+      
+      //tags = !tags ? tags.split(',') : [] ;
+     /* if (tags == null){
+        tags = tags.split(',');
+      } else {
+        tags = [];
+      }*/
+      console.log("tags=",tags)
+
       updateFormState(currentState => ({ ...currentState, saving: true }));
       const postId = uuid();
       const postInfo = { 
         name, 
         description, 
         link, 
-        categories: categories.split(',').toString(), 
-        products: products.split(',').toString(), 
-        tags: tags.split(',').toString(), 
+        categories: categories.toString(), 
+        industries: industries.toString(), 
+        products: products.toString(), 
+        tags: tags.toString(), 
         image: formState.image.name, 
+        sourcefile: formState.sourcefile.name, 
         id: postId 
       };
       console.log('createPost(), postInfo=', postInfo);
   
-      await API.graphql({
+      var createPostResult = await API.graphql({
         query: createPost,
         variables: { input: postInfo },
         authMode: 'AMAZON_COGNITO_USER_POOLS'
       }); // updated
+      console.log('createPostResult=', createPostResult);
       await Storage.put(formState.image.name, formState.image.fileInfo, {metadata: postInfo});
+
+      await Storage.put(formState.sourcefile.name, formState.sourcefile.fileInfo, {metadata: postInfo});
 
       Analytics.record({ name: 'create-post'});
       
@@ -122,6 +170,17 @@ export default function CreatePost({
         className={inputStyle}
         onChange={onChangeText}
       />
+      <input 
+        type="file"
+        name="sourcefile"
+        onChange={onChangeSourceFile}
+        ref={sourcefileInput}
+        style={{ display: 'none' }}
+      />
+      <button
+        className='upload-btn'
+        onClick={() => sourcefileInput.current.click()}
+      >Choose Source File</button>
       <input 
         type="file"
         onChange={onChangeFile}

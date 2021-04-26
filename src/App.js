@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Fragment } from "react";
 import { HashRouter, Switch, Route } from "react-router-dom";
 
 import { Storage, Auth } from 'aws-amplify';
@@ -24,7 +24,14 @@ import Button from './Button';
 const options = [
   { value: 'Amazon EC2', label: 'Amazon EC2' },
   { value: 'Amazon SNS', label: 'Amazon SNS' },
-  { value: 'AWS Lambda', label: 'AWS Lambda' }
+  { value: 'AWS Lambda', label: 'AWS Lambda' },
+  { value: 'AWS Lake Formation', label: 'AWS Lake Formation' },
+  { value: 'AWS Glue', label: 'AWS Glue' },
+  { value: 'AWS RDS', label: 'AWS RDS' },
+  { value: 'Amazon Redshift', label: 'Amazon Redshift' },
+  { value: 'Amazon Athena', label: 'Amazon Athena' },
+  { value: 'Amazon Redshift Spectrum', label: 'Amazon Redshift Spectrum' },
+  { value: 'Amazon EKS', label: 'Amazon EKS' }
 ]
 
 Analytics.autoTrack('session', {
@@ -93,17 +100,102 @@ function Router() {
     setPostState(postsArray);
   }
 
+  // https://react-select.com/home
   const AnimatedMulti = () => {
+    const [selectedOptions, setSelectedOptions] = useState('')
+
+    const getOptionsDiag = async (e) => {
+    //const getOptionsDiag = () => {
+      console.log('AnimatedMulti, getOptionsDiag(): start. label=', selectedOptions);
+
+      if (selectedOptions.length == 0) {
+        console.log('AnimatedMulti, getOptionsDiag(): no "selectedOptions" return.');
+        return;
+      }
+      
+      var searchStr = "";
+      selectedOptions.forEach(item => searchStr += item.value + " "); 
+      console.log('searchStr=', searchStr);
+
+      // filter: {products: {eq: "Amazon EC2"}, and: {products: {eq: "AWS Lambda"}}}
+      //var query = { filter: { products: { match: searchStr }} }
+      //var query = { filter: { and: [ { products: { match: "AWS Lambda" } }, { products: { match: "Amazon EC2" } } ] } }
+      
+      var query_and = [];
+      selectedOptions.forEach(item => query_and.push({ products: { matchPhrase: item.value } })); 
+      var query = { 
+        filter: { and: query_and }
+      }
+      console.log("query=",query);
+
+      const postData = await API.graphql(graphqlOperation(queries.searchPosts, query));
+      console.log("postData=",postData);
+
+      let postsArray = postData.data.searchPosts.items;
+      /* map over the image keys in the posts array, get signed image URLs for each image */
+      postsArray = await Promise.all(postsArray.map(async post => {
+        const imageKey = await Storage.get(post.image);
+        post.image = imageKey;
+        return post;
+      }));
+      /* update the posts array in the local state */
+      setPostState(postsArray);
+    }
+
+    const getPhotosForLabel = async (e) => {
+      console.log('AnimatedMulti, getPhotosForLabel(): start. label=', label);
+      console.log(e);
+      var label = e[0]["value"];
+      console.log('AnimatedMulti, getPhotosForLabel(): start. label=', label);
+      var query = { filter: { or: [ 
+        { description: { match: label } }, 
+        { categories: { match: label } }, 
+        { products: { match: label } }, 
+        { tags: { match: label } }, 
+        { industries: { match: label } }, 
+        { name: { match: label } }
+      ] } }
+      //const postData = await API.graphql(graphqlOperation(queries.searchPosts, { filter: { products: { match: label }} }));
+      const postData = await API.graphql(graphqlOperation(queries.searchPosts, query));
+
+      console.log('10 getPhotosForLabel(): postData:')
+      console.log(postData)
+      let postsArray = postData.data.searchPosts.items;
+      /* map over the image keys in the posts array, get signed image URLs for each image */
+      postsArray = await Promise.all(postsArray.map(async post => {
+        const imageKey = await Storage.get(post.image);
+        post.image = imageKey;
+        return post;
+      }));
+      /* update the posts array in the local state */
+      setPostState(postsArray);
+    }
+
     return (
+      <Fragment>
         <Select
           closeMenuOnSelect={false}
           components={animatedComponents}
-          defaultValue={[options[0]]}
+          defaultValue={[]}
           isMulti
           options={options}
+          onChange={(e) => { setSelectedOptions(e);  } }
         />
+        <Button title="Search" onClick={() => getOptionsDiag()} />
+        </Fragment>
       );
   }
+
+
+
+
+
+
+
+
+
+
+
 
   const Search = () => {
     
@@ -113,7 +205,8 @@ function Router() {
     const [searched, setSearched] = useState(false)
 
     Analytics.record({ name: 'perform-search', "label": label });
-  
+
+ 
     const getPhotosForLabel = async (e) => {
       console.log('getPhotosForLabel(): start. label=', label)
       /* query the API, ask for 100 items */
@@ -121,7 +214,17 @@ function Router() {
       //let postData = await API.graphql({ query: searchPosts, filter: {"match_phrase": {"products": label }}});
       //let postData = await API.graphql({ query: searchPosts, filter: {products: {match: "Lambda"}}});
 
-      const postData = await API.graphql(graphqlOperation(queries.searchPosts, { filter: { products: { match: label }} }));
+      var query = { filter: { or: [ 
+        { description: { match: label } }, 
+        { categories: { match: label } }, 
+        { products: { match: label } }, 
+        { tags: { match: label } }, 
+        { industries: { match: label } }, 
+        { name: { match: label } }
+      ] } }
+
+      //const postData = await API.graphql(graphqlOperation(queries.searchPosts, { filter: { products: { match: label }} }));
+      const postData = await API.graphql(graphqlOperation(queries.searchPosts, query));
 
       console.log('5 getPhotosForLabel(): postData:')
       console.log(postData)

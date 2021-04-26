@@ -6,6 +6,9 @@
   "license": "Apache-2.0",
   "dependencies": {
     "elasticsearch": "^16.0.0",
-    "http-aws-es": "^6.0.0"
+    "http-aws-es": "^6.0.0",
+    "aws-appsync": "^3.0.2",
+    "graphql-tag": "^2.10.1",
+    "isomorphic-fetch": "^2.2.1"
   }
 }

@@ -1,8 +1,8 @@
 import React, { useState, useEffect, Fragment } from "react";
 import { HashRouter, Switch, Route } from "react-router-dom";
 
-import { Storage, Auth } from 'aws-amplify';
-import { withAuthenticator, AmplifySignOut } from '@aws-amplify/ui-react';
+import Amplify, { Storage, Auth } from 'aws-amplify';
+import { AmplifyAuthenticator, AmplifySignUp } from '@aws-amplify/ui-react';
 import Analytics from '@aws-amplify/analytics';
 import { AuthState, onAuthUIStateChange } from '@aws-amplify/ui-components';
 import API, {graphqlOperation} from '@aws-amplify/api'
@@ -10,29 +10,77 @@ import API, {graphqlOperation} from '@aws-amplify/api'
 import { css } from '@emotion/css';
 
 import { listPosts, searchPosts } from './graphql/queries';
-import * as queries from './graphql/queries'
-import { Input, Segment} from 'semantic-ui-react'
+
+
+import * as queries from './graphql/queries';
+import * as mutations from './graphql/mutations';
+import * as subscriptions from './graphql/subscriptions';
+
+import { Button, Icon, Menu, Dropdown, Container, Input, Segment} from 'semantic-ui-react'
 import Select from 'react-select';
 import makeAnimated from 'react-select/animated';
+
+import awsconfig from './aws-exports';
 
 import Posts from './Posts';
 import Post from './Post';
 import Header from './Header';
-import CreatePost from './CreatePost';
-import Button from './Button';
+import DiagramCreation from './DiagramCreation';
 
-const options = [
-  { value: 'Amazon EC2', label: 'Amazon EC2' },
-  { value: 'Amazon SNS', label: 'Amazon SNS' },
-  { value: 'AWS Lambda', label: 'AWS Lambda' },
-  { value: 'AWS Lake Formation', label: 'AWS Lake Formation' },
-  { value: 'AWS Glue', label: 'AWS Glue' },
-  { value: 'AWS RDS', label: 'AWS RDS' },
-  { value: 'Amazon Redshift', label: 'Amazon Redshift' },
-  { value: 'Amazon Athena', label: 'Amazon Athena' },
-  { value: 'Amazon Redshift Spectrum', label: 'Amazon Redshift Spectrum' },
-  { value: 'Amazon EKS', label: 'Amazon EKS' }
+import './App.css';
+
+
+const dividerStyle = css`
+  margin-top: 10px;
+`
+
+const searchStyle = css`
+  width: 100%; 
+  display: flex;
+`
+const searchGlobalStyle = css`
+  width: 50%; 
+  float: left;
+`
+
+const searchProductsStyle = css`
+  width: 50%; 
+  float: right;
+`
+
+const searchProdStyle = css`
+  width: 100%; 
+  display: flex;
+`
+const searchProdSelectStyle = css`
+  width: 70%; 
+  float: left;
+`
+
+const searchProdButStyle = css`
+  width: 30%; 
+  float: right;
+`
+
+
+const contentStyle = css`
+  min-height: calc(100vh - 45px);
+  padding: 0px 40px;
+`
+
+const optionsProduct = [
+  { value: 'Amazon EC2', text: 'Amazon EC2', label: 'Amazon EC2' },
+  { value: 'Amazon SNS', text: 'Amazon SNS', label: 'Amazon SNS' },
+  { value: 'AWS Lambda', text: 'AWS Lambda', label: 'AWS Lambda' },
+  { value: 'AWS Lake Formation', text: 'AWS Lake Formation', label: 'AWS Lake Formation' },
+  { value: 'AWS Glue', text: 'AWS Glue', label: 'AWS Glue' },
+  { value: 'AWS RDS', text: 'AWS RDS', label: 'AWS RDS' },
+  { value: 'Amazon Redshift', text: 'Amazon Redshift', label: 'Amazon Redshift' },
+  { value: 'Amazon Athena', text: 'Amazon Athena', label: 'Amazon Athena' },
+  { value: 'Amazon Redshift Spectrum', text: 'Amazon Redshift Spectrum', label: 'Amazon Redshift Spectrum' },
+  { value: 'Amazon EKS', text: 'Amazon EKS', label: 'Amazon EKS' }
 ]
+
 
 Analytics.autoTrack('session', {
   enable: true
@@ -49,7 +97,19 @@ Analytics.autoTrack('event', {
 
 const animatedComponents = makeAnimated();
 
-function Router() {
+
+
+//import React from 'react';
+//import './App.css';
+//import Amplify, { Auth } from 'aws-amplify';
+//import { AmplifyAuthenticator, AmplifySignUp } from '@aws-amplify/ui-react';
+//import { AuthState, onAuthUIStateChange } from '@aws-amplify/ui-components';
+
+
+
+Amplify.configure(awsconfig);
+
+function Routerr() {
   /* create a couple of pieces of initial state */
   const [showOverlay, updateOverlayVisibility] = useState(false);
   const [posts, updatePosts] = useState([]);
@@ -173,16 +233,23 @@ function Router() {
 
     return (
       <Fragment>
-        <Select
-          closeMenuOnSelect={false}
-          components={animatedComponents}
-          defaultValue={[]}
-          isMulti
-          options={options}
-          onChange={(e) => { setSelectedOptions(e);  } }
-        />
-        <Button title="Search" onClick={() => getOptionsDiag()} />
-        </Fragment>
+        <div className={searchProdStyle}>
+          <div className={searchProdSelectStyle}>
+            <Select
+              closeMenuOnSelect={false}
+              placeholder="Select"
+              components={animatedComponents}
+              defaultValue={[]}
+              isMulti
+              options={optionsProduct}
+              onChange={(e) => { setSelectedOptions(e); } }
+            />
+          </div>
+          <div className={searchProdButStyle}>
+            <Button content="Search Product" onClick={() => getOptionsDiag()} />
+          </div>
+        </div>
+      </Fragment>
       );
   }
 
@@ -237,19 +304,6 @@ function Router() {
       }));
       /* update the posts array in the local state */
       setPostState(postsArray);
-
-
-/*
-        setPhotos([])
-        const postData = await API.graphql({ query: searchPosts, filter: {name: {match: "zz"}}});
-        console.log("getPhotosForLabel(): postData: " + postData)
-        console.log(postData)
-        if (result.data.searchPosts.items.length !== 0) {
-            setHasResults(result.data.searchPhotos.items.length > 0)
-            setPhotos(p => p.concat(result.data.searchPhotos.items))
-        }
-        setSearched(true)
-        */
     }
   
     const NoResults = () => {
@@ -259,7 +313,6 @@ function Router() {
     }
   
     return (
-        <Segment>
           <Input
             type='text'
             placeholder='Search for photos'
@@ -270,12 +323,6 @@ function Router() {
             value={label}
             onChange={(e) => { setLabel(e.target.value); setSearched(false);} }
           />
-          {/*
-              hasResults
-              ? <PhotosList photos={photos} />
-              : <NoResults />*/
-          }
-        </Segment>
     );
   }
   
@@ -294,9 +341,15 @@ function Router() {
           <div className={contentStyle}>
             <Header />
             <hr className={dividerStyle} />
-            <Button title="New Post" onClick={() => updateOverlayVisibility(true)} />
-            <Route path="/" exact component={Search}/>
-            <Route path="/" exact component={AnimatedMulti}/>
+            <div className={searchStyle}>
+              <div className={searchGlobalStyle}>
+                <Route path="/" exact component={Search}/>
+              </div>
+              <div className={searchProductsStyle}>
+                <Route path="/" exact component={AnimatedMulti}/>
+              </div>
+            </div>
+            <hr className={dividerStyle} />
             <Switch>
               <Route exact path="/" >
                 <Posts posts={posts} />
@@ -309,31 +362,54 @@ function Router() {
               </Route>
             </Switch>
           </div>
-          <AmplifySignOut />
+          {/*<AmplifySignOut />*/}
         </HashRouter>
-        { showOverlay && (
-          <CreatePost
-            updateOverlayVisibility={updateOverlayVisibility}
-            updatePosts={setPostState}
-            posts={posts}
-          />
-        )}
+       
     </>
   );
 }
 
-const dividerStyle = css`
-  margin-top: 15px;
-`
 
-const contentStyle = css`
-  min-height: calc(100vh - 45px);
-  padding: 0px 40px;
-`
 
-export default withAuthenticator(Router, {
-  includeGreetings: true,
-  signUpConfig: {
-    hiddenDefaults: ['phone_number']
-  }
-});
+function AuthStateApp() {
+  const [authState, setAuthState] = React.useState();
+  const [user, setUser] = React.useState();
+
+  React.useEffect(() => {
+    onAuthUIStateChange((nextAuthState, authData) => {
+      setAuthState(nextAuthState);
+      setUser(authData);
+    });
+  }, []);
+  document.title = 'Travel Deals';
+  return authState === AuthState.SignedIn && user ? (
+      <div className='App'>
+        <Menu fixed='top' color='teal' inverted>
+          <Menu.Menu>
+            <Menu.Item header href='/'><Icon name='searchengin'/>Architecture Diagram search</Menu.Item>
+          </Menu.Menu>
+          <Menu.Menu position='right'>
+            <Menu.Item link><DiagramCreation/></Menu.Item>
+            <Dropdown item simple text={user.username}>
+              <Dropdown.Menu>
+                <Dropdown.Item onClick={() => Auth.signOut()}><Icon name='power off'/>Log Out</Dropdown.Item>
+              </Dropdown.Menu>
+            </Dropdown>
+          </Menu.Menu>
+        </Menu>
+        <Container style={{ marginTop: 70 }}>
+            <Routerr/> 
+          </Container>
+      </div>
+    ) : (
+      <AmplifyAuthenticator>
+        <AmplifySignUp slot='sign-up' formFields={[
+            { type: 'username' },
+            { type: 'password' },
+            { type: 'email' }
+          ]}/>
+      </AmplifyAuthenticator>
+  );
+};
+
+export default AuthStateApp;

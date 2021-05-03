@@ -4,10 +4,10 @@ import { Link } from 'react-router-dom';
 
 export default function Header() {
   return (
-    <div className={headerContainer}>
-      <h1 className={headerStyle}>Postagram</h1>
-      <Link to="/" className={linkStyle}>All Posts</Link>
-      <Link to="/myposts" className={linkStyle}>My Posts</Link>
+    <div>
+      <h1 className={headerStyle}>Diagram Search</h1>
+      <Link to="/" className={linkStyle}>All Diagrams</Link>
+      <Link to="/myposts" className={linkStyle}>My Daigrams</Link>
     </div>
   )
 }
@@ -18,11 +18,9 @@ const headerContainer = css`
 
 const headerStyle = css`
   font-size: 40px;
-  margin-top: 0px;
 `
 
 const linkStyle = css`
-  color: black;
   font-weight: bold;
   text-decoration: none;
   margin-right: 10px;

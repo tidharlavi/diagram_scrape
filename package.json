@@ -15,6 +15,7 @@
     "aws-sdk": "^2.892.0",
     "elasticsearch": "^16.7.2",
     "emotion": "^11.0.0",
+    "faker": "^5.5.3",
     "http-aws-es": "^6.0.0",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",

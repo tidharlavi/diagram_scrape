@@ -7,13 +7,14 @@ export default function Posts({
 }) {
   return (
     <>
-      <h1>Posts</h1>
       {
         posts.map(post => (
           <Link to={`/post/${post.id}`} className={linkStyle} key={post.id}>
             <div key={post.id} className={postContainer}>
               <h1 className={postTitleStyle}>{post.name}</h1>
-              <img alt="post" className={imageStyle} src={post.image} />
+              <div className={containerStyle}>
+                <img alt="post" className={imageStyle} src={post.image} />
+              </div>
             </div>
           </Link>
         ))
@@ -24,11 +25,9 @@ export default function Posts({
 
 const postTitleStyle = css`
   margin: 15px 0px;
-  color: #0070f3;
 `
 
 const linkStyle = css`
-  text-decoration: none;
 `
 
 const postContainer = css`
@@ -40,8 +39,12 @@ const postContainer = css`
     border-color: #0070f3;
   }
 `
+const containerStyle = css`
+  width: 80%;
+  margin-left: 10%;
+`
 
 const imageStyle = css`
-  width: 100%;
-  max-width: 400px;
+  max-height: 100%;
+  max-width: 100%;  
 `

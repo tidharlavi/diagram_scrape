@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react'
+
 import { css } from '@emotion/css';
+
 import { useParams } from 'react-router-dom';
 import { API, Storage } from 'aws-amplify';
 import Analytics from '@aws-amplify/analytics';
 import { getPost } from './graphql/queries';
-import Button from './Button';
+
+import { Item, Message, Button, Label, Modal, Icon, Dropdown, Input } from 'semantic-ui-react'
 
 export default function Post() {
   const [loading, updateLoading] = useState(true);
@@ -51,10 +54,11 @@ export default function Post() {
       const postData = await API.graphql({
         query: getPost, variables: { id }
       });
+      console.log('fetchPost: postData=', postData)
       const currentPost = postData.data.getPost
       const image = await Storage.get(currentPost.image);
 
-      Analytics.record({ name: 'fetch-post'});
+      Analytics.record({ name: 'fetch-diagram'});
 
       currentPost.image = image;
       updatePost(currentPost);
@@ -71,43 +75,95 @@ export default function Post() {
     productsStr = post.products.join(', ');
   }
 
-  var tagsStr = "";
-  if (post.tags != null) {
-    tagsStr = post.tags.join(', ');
-  }
-
   var categoriesStr = "";
   if (post.categories != null) {
     categoriesStr = post.categories.join(', ');
   }
 
+  var industriesStr = "";
+  if (post.industries != null) {
+    industriesStr = post.industries.join(', ');
+  }
+
+  var tagsStr = "";
+  if (post.tags != null) {
+    tagsStr = post.tags.join(', ');
+  }
+
+  
+
   return (
-    <>
-      <h1 className={titleStyle}>Name: {post.name}</h1>
-      <a href={post.link}>{post.link}</a>
-      <h3 className={linkStyle}>Categories: {categoriesStr}</h3>
-      <h3 className={linkStyle}>Products: {productsStr }</h3>
-      <h3 className={linkStyle}>Tags: {tagsStr}</h3>
+    <div>
+      <h1 className={titleStyle}>{post.name}</h1>
+      
+      {post.link ? (<a href={post.link}>{post.link}</a>) : (<div></div>)}
+      <Message>
+        <p>
+        {post.description}
+        </p>
+      </Message>
+
+      <h3 className={linkStyle}>Product: {((post.products.length > 0) && (post.products[0] != "")) ? 
+                                              post.products.map(item => (<Label>{item}</Label>)) : 
+                                              (<div></div>) 
+                                          }
+      </h3>
+      <h3 className={linkStyle}>Category: {((post.categories.length > 0) && (post.categories[0] != "")) ? 
+                                              post.categories[0].split(',').map(item => (<Label>{item}</Label>)) : 
+                                              (<div></div>) 
+                                          }
+      </h3>
+      <h3 className={linkStyle}>Industry: {((post.industries.length > 0) && (post.industries[0] != "")) ? 
+                                              post.industries[0].split(',').map(item => (<Label>{item}</Label>)) : 
+                                              (<div></div>) 
+                                          }
+      </h3>
+      <h3 className={linkStyle}>Tags: {((post.tags.length > 0) && (post.tags[0] != "")) ? 
+                                              post.tags[0].split(',').map(item => (<Label>{item}</Label>)) : 
+                                              (<div></div>) 
+                                          }
+      </h3>
+
       <h3 className={linkStyle}>Owner: {post.owner}</h3>
       <h3 className={linkStyle}>Updated: {post.updatedAt}</h3>
       <h3 className={linkStyle}>Created: {post.createdAt}</h3>
-      <Button title="Download Source File" onClick={() => downloadSourcefile(true)} />
-      <p>Description: {post.description}</p>
+      
       <img alt="post" src={post.image} className={imageStyle} />
-    </>
+      <div className={buttonStyle}>
+        {post.sourcefile ? (
+          <Button 
+            content="Download Source File" 
+            positive 
+            labelPosition='right' 
+            icon='download' 
+            onClick={() => downloadSourcefile(true)} 
+          /> 
+          ) : (
+            <div></div>
+          )}
+        </div>
+    </div>
   )
 }
 
 const titleStyle = css`
   margin-bottom: 7px;
+
 `
 
 const linkStyle = css`
-  color: #0070f3;
-  margin: 0;
+  text-align: left;
+`
+
+const buttonStyle = css`
+  margin: 10px;
 `
 
 const imageStyle = css`
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  border: 1px solid #55555538;
   max-width: 500px;
   @media (max-width: 500px) {
     width: 100%;

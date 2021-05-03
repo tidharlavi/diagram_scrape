@@ -255,7 +255,7 @@ export default function DiagramCreation() {
             disabled = {!(name && description && formState.file)} 
             onClick={handleSave}
             data-amplify-analytics-on='click'
-            data-amplify-analytics-name='createDeal-complete'
+            data-amplify-analytics-name='createDiagram-complete'
             data-amplify-analytics-attrs={`name:${name}, description:${description}`}/>
         </Modal.Actions>
       </Modal>

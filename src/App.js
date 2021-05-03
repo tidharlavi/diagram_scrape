@@ -168,6 +168,8 @@ function Routerr() {
     //const getOptionsDiag = () => {
       console.log('AnimatedMulti, getOptionsDiag(): start. label=', selectedOptions);
 
+      Analytics.record({ name: 'perform-product-search', "label": selectedOptions });
+
       if (selectedOptions.length == 0) {
         console.log('AnimatedMulti, getOptionsDiag(): no "selectedOptions" return.');
         return;

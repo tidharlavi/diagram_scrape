@@ -46,6 +46,8 @@ export default function Post() {
 
     console.log('filenameFull: ', filenameFull)
 
+    Analytics.record({ name: 'download-diagram-source', "diagramId": post.id });
+
     downloadBlob(result.Body, filenameFull);
   }
 
@@ -58,7 +60,7 @@ export default function Post() {
       const currentPost = postData.data.getPost
       const image = await Storage.get(currentPost.image);
 
-      Analytics.record({ name: 'fetch-diagram'});
+      Analytics.record({ name: 'fetch-diagram', "diagramId": currentPost.id });
 
       currentPost.image = image;
       updatePost(currentPost);
@@ -70,27 +72,6 @@ export default function Post() {
   if (loading) return <h3>Loading...</h3>
   console.log('post: ', post)
 
-  var productsStr = "";
-  if (post.products != null) {
-    productsStr = post.products.join(', ');
-  }
-
-  var categoriesStr = "";
-  if (post.categories != null) {
-    categoriesStr = post.categories.join(', ');
-  }
-
-  var industriesStr = "";
-  if (post.industries != null) {
-    industriesStr = post.industries.join(', ');
-  }
-
-  var tagsStr = "";
-  if (post.tags != null) {
-    tagsStr = post.tags.join(', ');
-  }
-
-  
 
   return (
     <div>

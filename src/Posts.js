@@ -28,6 +28,7 @@ const postTitleStyle = css`
 `
 
 const linkStyle = css`
+  text-decoration: none;
 `
 
 const postContainer = css`
@@ -45,6 +46,7 @@ const containerStyle = css`
 `
 
 const imageStyle = css`
-  max-height: 100%;
-  max-width: 100%;  
+  max-height: 300px;
+  max-width: 100%; 
+  border: 1px solid #55555538; 
 `

@@ -1,5 +1,8 @@
 import React, { useState, useEffect, Fragment } from "react";
 import { HashRouter, Switch, Route } from "react-router-dom";
+import { Button, Icon, Menu, Dropdown, Container, Input, Segment} from 'semantic-ui-react'
+import Select from 'react-select';
+import makeAnimated from 'react-select/animated';
 
 import Amplify, { Storage, Auth } from 'aws-amplify';
 import { AmplifyAuthenticator, AmplifySignUp } from '@aws-amplify/ui-react';
@@ -9,16 +12,9 @@ import API, {graphqlOperation} from '@aws-amplify/api'
 
 import { css } from '@emotion/css';
 
-import { listPosts, searchPosts } from './graphql/queries';
-
-
 import * as queries from './graphql/queries';
-import * as mutations from './graphql/mutations';
-import * as subscriptions from './graphql/subscriptions';
+import { listPosts } from './graphql/queries';
 
-import { Button, Icon, Menu, Dropdown, Container, Input, Segment} from 'semantic-ui-react'
-import Select from 'react-select';
-import makeAnimated from 'react-select/animated';
 
 import awsconfig from './aws-exports';
 
@@ -70,15 +66,49 @@ const contentStyle = css`
 
 const optionsProduct = [
   { value: 'Amazon EC2', text: 'Amazon EC2', label: 'Amazon EC2' },
-  { value: 'Amazon SNS', text: 'Amazon SNS', label: 'Amazon SNS' },
+  { value: 'Amazon Simple Notification Service (SNS)', text: 'Amazon Simple Notification Service (SNS)', label: 'Amazon Simple Notification Service (SNS)' },
   { value: 'AWS Lambda', text: 'AWS Lambda', label: 'AWS Lambda' },
   { value: 'AWS Lake Formation', text: 'AWS Lake Formation', label: 'AWS Lake Formation' },
   { value: 'AWS Glue', text: 'AWS Glue', label: 'AWS Glue' },
-  { value: 'AWS RDS', text: 'AWS RDS', label: 'AWS RDS' },
+  { value: 'Amazon RDS', text: 'Amazon RDS', label: 'Amazon RDS' },
   { value: 'Amazon Redshift', text: 'Amazon Redshift', label: 'Amazon Redshift' },
   { value: 'Amazon Athena', text: 'Amazon Athena', label: 'Amazon Athena' },
   { value: 'Amazon Redshift Spectrum', text: 'Amazon Redshift Spectrum', label: 'Amazon Redshift Spectrum' },
-  { value: 'Amazon EKS', text: 'Amazon EKS', label: 'Amazon EKS' }
+  { value: 'Amazon EKS', text: 'Amazon EKS', label: 'Amazon EKS' },
+  { value: 'Amazon API Gateway', text: 'Amazon API Gateway', label: 'Amazon API Gateway' },
+  { value: 'Amazon S3', text: 'Amazon S3', label: 'Amazon S3' },
+  { value: 'Amazon Kinesis Data Stream', text: 'Amazon Kinesis Data Stream', label: 'Amazon Kinesis Data Stream' },
+  { value: 'Amazon Rekognition', text: 'Amazon Rekognition', label: 'Amazon Rekognition' },
+  { value: 'Amazon Pinpoint', text: 'Amazon Pinpoint', label: 'Amazon Pinpoint' },
+  { value: 'Amazon Lex', text: 'Amazon Lex', label: 'Amazon Lex' },
+  { value: 'Amazon SageMaker', text: 'Amazon SageMaker', label: 'Amazon SageMaker' },
+  { value: 'AWS IoT Core', text: 'AWS IoT Core', label: 'AWS IoT Core' },
+  { value: 'AWS IoT Greengrass', text: 'AWS IoT Greengrass', label: 'AWS IoT Greengrass' },
+  { value: 'Elastic Load Balancing', text: 'Elastic Load Balancing', label: 'Elastic Load Balancing' },
+  { value: 'Amazon Route 53', text: 'Amazon Route 53', label: 'Amazon Route 53' },
+  { value: 'Amazon Aurora', text: 'Amazon Aurora', label: 'Amazon Aurora' },
+  { value: 'Amazon Elastic Block Store (EBS)', text: 'Amazon Elastic Block Store (EBS)', label: 'Amazon Elastic Block Store (EBS)' },
+  { value: 'Amazon Elastic File System (EFS)', text: 'Amazon Elastic File System (EFS)', label: 'Amazon Elastic File System (EFS)' },
+  { value: 'Amazon MQ', text: 'Amazon MQ', label: 'Amazon MQ' },
+  { value: 'Amazon CloudHSM', text: 'Amazon CloudHSM', label: 'Amazon CloudHSM' },
+  { value: 'Amazon Kinesis Data Firehos', text: 'Amazon Kinesis Data Firehos', label: 'Amazon Kinesis Data Firehos' },
+  { value: 'Amazon Comprehend', text: 'Amazon Comprehend', label: 'Amazon Comprehend' },
+  { value: 'Amazon QuickSight', text: 'Amazon QuickSight', label: 'Amazon QuickSight' },
+  { value: 'AWS IoT SiteWise', text: 'AWS IoT SiteWise', label: 'AWS IoT SiteWise' },
+  { value: 'Amazon TimeStream', text: 'Amazon TimeStream', label: 'Amazon TimeStream' },
+  { value: 'Amazon Kinesis Data Analytics', text: 'Amazon Kinesis Data Analytics', label: 'Amazon Kinesis Data Analytics' },
+  { value: 'AWS Global Accelerator', text: 'AWS Global Accelerator', label: 'AWS Global Accelerator' },
+  { value: 'Amazon DynamoDB', text: 'Amazon DynamoDB', label: 'Amazon DynamoDB' },
+  { value: 'Amazon CloudFront', text: 'Amazon CloudFront', label: 'Amazon CloudFront' },
+  { value: 'Amazon MSK', text: 'Amazon MSK', label: 'Amazon MSK' },
+  { value: 'Amazon Elasticsearch Service', text: 'Amazon Elasticsearch Service', label: 'Amazon Elasticsearch Service' },
+  { value: 'Amazon EMR', text: 'Amazon EMR', label: 'Amazon EMR' },
+  { value: 'Amazon ECR', text: 'Amazon ECR', label: 'Amazon ECR' },
+  { value: 'Amazon DocumentDB', text: 'Amazon DocumentDB', label: 'Amazon DocumentDB' },
+  { value: 'Amazon Cognito', text: 'Amazon Cognito', label: 'Amazon Cognito' },
+  { value: 'AWS Amplify', text: 'AWS Amplify', label: 'AWS Amplify' },
+  { value: 'Amazon SageMaker Notebook', text: 'Amazon SageMaker Notebook', label: 'Amazon SageMaker Notebook' },
+  { value: 'AWS IAM', text: 'AWS IAM', label: 'AWS IAM' },
 ]
 
 
@@ -96,16 +126,6 @@ Analytics.autoTrack('event', {
 });
 
 const animatedComponents = makeAnimated();
-
-
-
-//import React from 'react';
-//import './App.css';
-//import Amplify, { Auth } from 'aws-amplify';
-//import { AmplifyAuthenticator, AmplifySignUp } from '@aws-amplify/ui-react';
-//import { AuthState, onAuthUIStateChange } from '@aws-amplify/ui-components';
-
-
 
 Amplify.configure(awsconfig);
 
@@ -179,10 +199,6 @@ function Routerr() {
       selectedOptions.forEach(item => searchStr += item.value + " "); 
       console.log('searchStr=', searchStr);
 
-      // filter: {products: {eq: "Amazon EC2"}, and: {products: {eq: "AWS Lambda"}}}
-      //var query = { filter: { products: { match: searchStr }} }
-      //var query = { filter: { and: [ { products: { match: "AWS Lambda" } }, { products: { match: "Amazon EC2" } } ] } }
-      
       var query_and = [];
       selectedOptions.forEach(item => query_and.push({ products: { matchPhrase: item.value } })); 
       var query = { 
@@ -204,34 +220,7 @@ function Routerr() {
       setPostState(postsArray);
     }
 
-    const getPhotosForLabel = async (e) => {
-      console.log('AnimatedMulti, getPhotosForLabel(): start. label=', label);
-      console.log(e);
-      var label = e[0]["value"];
-      console.log('AnimatedMulti, getPhotosForLabel(): start. label=', label);
-      var query = { filter: { or: [ 
-        { description: { match: label } }, 
-        { categories: { match: label } }, 
-        { products: { match: label } }, 
-        { tags: { match: label } }, 
-        { industries: { match: label } }, 
-        { name: { match: label } }
-      ] } }
-      //const postData = await API.graphql(graphqlOperation(queries.searchPosts, { filter: { products: { match: label }} }));
-      const postData = await API.graphql(graphqlOperation(queries.searchPosts, query));
 
-      console.log('10 getPhotosForLabel(): postData:')
-      console.log(postData)
-      let postsArray = postData.data.searchPosts.items;
-      /* map over the image keys in the posts array, get signed image URLs for each image */
-      postsArray = await Promise.all(postsArray.map(async post => {
-        const imageKey = await Storage.get(post.image);
-        post.image = imageKey;
-        return post;
-      }));
-      /* update the posts array in the local state */
-      setPostState(postsArray);
-    }
 
     return (
       <Fragment>
@@ -239,7 +228,7 @@ function Routerr() {
           <div className={searchProdSelectStyle}>
             <Select
               closeMenuOnSelect={false}
-              placeholder="Select"
+              placeholder="Search Product"
               components={animatedComponents}
               defaultValue={[]}
               isMulti
@@ -255,33 +244,13 @@ function Routerr() {
       );
   }
 
-
-
-
-
-
-
-
-
-
-
-
   const Search = () => {
-    
-    const [photos, setPhotos] = useState([])
     const [label, setLabel] = useState('')
-    const [hasResults, setHasResults] = useState(false)
     const [searched, setSearched] = useState(false)
-
-    Analytics.record({ name: 'perform-search', "label": label });
-
  
-    const getPhotosForLabel = async (e) => {
-      console.log('getPhotosForLabel(): start. label=', label)
-      /* query the API, ask for 100 items */
-      //let postData = await API.graphql({ query: searchPosts, filter: {products: {match: label}}});
-      //let postData = await API.graphql({ query: searchPosts, filter: {"match_phrase": {"products": label }}});
-      //let postData = await API.graphql({ query: searchPosts, filter: {products: {match: "Lambda"}}});
+    const searchDiagrams = async (e) => {
+      console.log('searchDiagrams(): start. label=', label)
+      Analytics.record({ name: 'perform-search', "label": label });
 
       var query = { filter: { or: [ 
         { description: { match: label } }, 
@@ -295,7 +264,7 @@ function Routerr() {
       //const postData = await API.graphql(graphqlOperation(queries.searchPosts, { filter: { products: { match: label }} }));
       const postData = await API.graphql(graphqlOperation(queries.searchPosts, query));
 
-      console.log('5 getPhotosForLabel(): postData:')
+      console.log('5 searchDiagrams(): postData:')
       console.log(postData)
       let postsArray = postData.data.searchPosts.items;
       /* map over the image keys in the posts array, get signed image URLs for each image */
@@ -308,19 +277,13 @@ function Routerr() {
       setPostState(postsArray);
     }
   
-    const NoResults = () => {
-      return !searched
-        ? ''
-        : <Header as='h4' color='grey'>No photos found matching '{label}'</Header>
-    }
-  
     return (
           <Input
             type='text'
-            placeholder='Search for photos'
+            placeholder='Search'
             icon='search'
             iconPosition='left'
-            action={{ content: 'Search', onClick: getPhotosForLabel }}
+            action={{ content: 'Search', onClick: searchDiagrams }}
             name='label'
             value={label}
             onChange={(e) => { setLabel(e.target.value); setSearched(false);} }

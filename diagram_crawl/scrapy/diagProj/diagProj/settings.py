@@ -1,4 +1,4 @@
-# Scrapy settings for diagProj project
+    # Scrapy settings for diagProj project
 #
 # For simplicity, this file contains only settings considered important or
 # commonly used. You can find more settings consulting the documentation:
@@ -12,7 +12,10 @@ BOT_NAME = 'diagProj'
 SPIDER_MODULES = ['diagProj.spiders']
 NEWSPIDER_MODULE = 'diagProj.spiders'
 
-ITEM_PIPELINES = {'scrapy.pipelines.images.ImagesPipeline': 1}
+ITEM_PIPELINES = {
+    'scrapy.pipelines.images.ImagesPipeline': 1,
+    'diagProj.pipelines.DynamoDBPipeline': 100
+}
 
 #IMAGES_STORE = '/Users/eliadm/dev/diagram_crawl/scrapy/diagProj/images'
 IMAGES_STORE = 's3://blog-crawler/images/'

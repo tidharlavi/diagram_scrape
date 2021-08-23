@@ -13,6 +13,8 @@ class DiagprojItem(scrapy.Item):
 
 class BlogItem(scrapy.Item):
     url = scrapy.Field()
+    dateCreatedScrape = scrapy.Field()
+    dateUpdatedScrape = scrapy.Field()
     headerMetaTags = scrapy.Field()
     images = scrapy.Field()
     version = scrapy.Field()

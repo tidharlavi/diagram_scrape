@@ -275,8 +275,8 @@ def blog_list_get():
 
     downloadFile = True
 
-    outputDir = '/Users/eliadm/PycharmProjects/diagramSearch/output/blog_list_webpage'
-    scrapeInputPath = '/Users/eliadm/dev/diagram_crawl/scrapy/diagProj/input/blog_list_1.json'
+    outputDir = '/Users/eliadm/dev/diagram_scrape/diagramSearch/output/blog_list_webpage'
+    scrapeInputPath = '/Users/eliadm/dev/diagram_scrape/diagram_crawl/scrapy/diagProj/input/blog_list_1.json'
 
     size = 30
     page = 3
@@ -308,7 +308,7 @@ def blog_list_get():
     shutil.copyfile(output_file, scrapeInputPath)
 
 def app_diagram_add():
-    inputFile = '/Users/eliadm/PycharmProjects/diagramSearch/output/image_output_list.list'
+    inputFile = '/Users/eliadm/dev/diagram_scrape/diagramSearch/output/image_output_list_1.list'
 
     imagesList = None
 
@@ -348,7 +348,7 @@ def app_diagram_add():
         for tag in image["tags"]:
             item["tags"]["L"].append({"S": tag})
 
-        log.info("Going to add: image='" + item["image"]["S"] +"', link='"+ item["link"]["S"]+"', tags='"+str(len(item["tags"]["L"]))+"'.")
+        log.info("Going to add: image='" + item["image"]["S"] +"', link='"+ item["link"]["S"]+"', tags='"+str(len(item["tags"]["L"]))+"', products='"+str(len(item["products"]["L"]))+"'.")
         log.debug(json.dumps(item, indent=4, sort_keys=True))
 
         # Update DynamoDB
@@ -375,7 +375,7 @@ def main():
     if (False):
         blog_list_get()
 
-    if (True):
+    if (False):
         blog_images_prepare()
 
     ## Update Dynamo and copy files to App S3 folder

@@ -18,7 +18,7 @@
       "function": {
         "S3Triggera2847b08": {
           "deploymentBucketName": "amplify-postagram-dev-195026-deployment",
-          "s3Key": "amplify-builds/S3Triggera2847b08-4f36654b4357512f2f58-build.zip"
+          "s3Key": "amplify-builds/S3Triggera2847b08-58346a312f4f53636d57-build.zip"
         }
       },
       "hosting": {

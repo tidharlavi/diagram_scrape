@@ -54,6 +54,7 @@ const optionsIndustry = [
   { value: 'Defence', text: 'Defence' },
   { value: 'Gaming', text: 'Gaming' },
   { value: 'Agriculture', text: 'Agriculture' },
+  { value: 'Healthcare', text: 'Healthcare' },
 ]
 
 const optionsTag = [
@@ -66,6 +67,9 @@ const optionsTag = [
   { value: 'Migration', text: 'Migration' },
   { value: 'Lambda@Edge', text: 'Lambda@Edge' },
   { value: 'Blog', text: 'Blog' },
+  { value: 'Solution', text: 'Solution' },
+  { value: 'Workshop', text: 'Workshop' },
+  { value: 'Medium', text: 'Medium' },
 ]
 
 const initialState = {
@@ -188,6 +192,17 @@ export default function DiagramCreation() {
     };
 
     var diagramMulti = [
+      /*{ // Not working, 2 images with the same name
+        name: "Blog - Amazon MSK Backup for Archival, Replay, or Analytics",
+        description: "Amazon MSK is a fully managed service that helps you build and run applications that use Apache Kafka to process streaming data. Apache Kafka is an open-source platform for building real-time streaming data pipelines and applications. With Amazon MSK, you can use native Apache Kafka APIs to populate data lakes. You can also stream changes to and from databases, and power machine learning and analytics applications.",
+        link: "https://aws.amazon.com/blogs/architecture/amazon-msk-backup-for-archival-replay-or-analytics/",
+        products: [""],
+        categories: ["Analytics"],
+        industries: [""],
+        tags: ["Amazon EMR", "Amazon Managed Streaming For Apache Kafka (Amazon MSK)", "Architecture", "AWS Glue", "Kinesis Data Firehose", "Blog" ],
+        imagePath: "./diagrams/amazon-msk-backup-for-archival-replay-or-analytics.png",
+        sourcefilePath: "",
+      },*//*
      {
         name: "Blog - NLX is Helping Travelers Amid Disruption with AI-Powered Automation",
         description: "Travel impacts brought by the global pandemic left several airlines experiencing frequent flight disruptions, which increased flight scheduling change notifications being made to affected travelers.",
@@ -295,17 +310,6 @@ export default function DiagramCreation() {
         categories: ["Analytics"],
         industries: [""],
         tags: ["Amazon EMR", "Amazon Managed Streaming For Apache Kafka (Amazon MSK)", "Architecture", "AWS Glue", "Kinesis Data Firehose", "Blog" ],
-        imagePath: "./diagrams/amazon-msk-backup-for-archival-replay-or-analytics.png",
-        sourcefilePath: "",
-      },
-      {
-        name: "Blog - Amazon MSK Backup for Archival, Replay, or Analytics",
-        description: "Amazon MSK is a fully managed service that helps you build and run applications that use Apache Kafka to process streaming data. Apache Kafka is an open-source platform for building real-time streaming data pipelines and applications. With Amazon MSK, you can use native Apache Kafka APIs to populate data lakes. You can also stream changes to and from databases, and power machine learning and analytics applications.",
-        link: "https://aws.amazon.com/blogs/architecture/amazon-msk-backup-for-archival-replay-or-analytics/",
-        products: [""],
-        categories: ["Analytics"],
-        industries: [""],
-        tags: ["Amazon EMR", "Amazon Managed Streaming For Apache Kafka (Amazon MSK)", "Architecture", "AWS Glue", "Kinesis Data Firehose", "Blog" ],
         imagePath: "./diagrams/amazon-msk-backup-for-archival-replay-or-analytics-2.png",
         sourcefilePath: "",
       },
@@ -331,7 +335,6 @@ export default function DiagramCreation() {
         imagePath: "./diagrams/field-notes-speed-up-redaction-of-connected-car-data-by-multiprocessing-video-footage-with-amazon-rekognition.png",
         sourcefilePath: "",
       },
-      ,
       {
         name: "Workshop - WILD RYDES",
         description: "The application will present users with an HTML based user interface for indicating the location where they would like to be picked up and will interface on the backend with a RESTful web service to submit the request and dispatch a nearby unicorn. The application will also provide facilities for users to register with the service and log in before requesting rides.",
@@ -343,6 +346,61 @@ export default function DiagramCreation() {
         imagePath: "./diagrams/wildrydes-complete-architecture.png",
         sourcefilePath: "",
       },
+      {
+        name: "Solution Implementation - Serverless Image Handler",
+        description: "The Serverless Image Handler solution provides a highly available serverless architecture that initiates cost-effective image processing in the AWS Cloud.",
+        link: "https://aws.amazon.com/solutions/implementations/serverless-image-handler/",
+        products: [""],
+        categories: ["Serverless"],
+        industries: [""],
+        tags: ["Solutions" ],
+        imagePath: "./diagrams/serverless-image-handler.png",
+        sourcefilePath: "",
+      },
+      {
+        name: "Blog - Retain more for less with UltraWarm for Amazon Elasticsearch Service",
+        description: "UltraWarm, a new storage tier for Amazon Elasticsearch Service, removes this tension, enabling you to dramatically extend your data retention period and reduce costs by up to 90% over hot storage. Best of all, the interactive analytics experience remains. Query your warm indices just like any other index, or use them to build Kibana dashboards.",
+        link: "https://aws.amazon.com/blogs/database/retain-more-for-less-with-ultrawarm-for-amazon-elasticsearch-service/",
+        products: [""],
+        categories: ["Serverless"],
+        industries: [""],
+        tags: ["Amazon Elasticsearch Service", "UltraWarm", "Blog" ],
+        imagePath: "./diagrams/retain-more-for-less-with-ultrawarm-for-amazon-elasticsearch-service.jpeg",
+        sourcefilePath: "",
+      },
+      {
+        name: "Solution Implementation - Distributed Load Testing on AWS",
+        description: "This solution implementation automates software applications testing at scale and at load to help you identify potential performance issues before their release. This solution creates and simulates thousands of connected users generating transactional records at a constant pace without the need to provision servers.",
+        link: "https://aws.amazon.com/solutions/implementations/distributed-load-testing-on-aws/",
+        products: [""],
+        categories: ["Developer tools"],
+        industries: [""],
+        tags: ["Solutions" ],
+        imagePath: "./diagrams/distributed-load-testing-on-aws.png",
+        sourcefilePath: "",
+      },
+      {
+        name: "Medium - End-To-End Serverless ETL Orchestration in AWS: A Guide",
+        description: "A serverless architecture enables agile principles and allows continuous delivery to customers, it supports requirement changes, and without any surplus need to manage infrastructure. It also empowers developers to own the platform.",
+        link: "https://aws.plainenglish.io/end-to-end-serverless-etl-orchestration-in-aws-322fedd4402f",
+        products: [""],
+        categories: ["Serverless"],
+        industries: [""],
+        tags: ["Medium" ],
+        imagePath: "./diagrams/end-to-end-serverless-etl-orchestration-in-aws-322fedd4402f.png",
+        sourcefilePath: "",
+      },*/
+      {
+        name: "Solution - Document Understanding Solution",
+        description: "The Document Understanding Solution (DUS) delivers an easy-to-use web application that ingests and analyzes files, extracts text from documents, identifies structural data (tables, key value pairs), extracts critical information (entities), and creates smart search indexes from the data. Additionally, files can be uploaded directly to and analyzed files can be accessed from an Amazon Simple Storage Service (Amazon S3) bucket in your AWS account.",
+        link: "https://aws.amazon.com/solutions/implementations/document-understanding-solution/",
+        products: [""],
+        categories: ["Serverless"],
+        industries: ["Healthcare"],
+        tags: ["Solution" ],
+        imagePath: "./diagrams/document-understanding-solution.png",
+        sourcefilePath: "",
+      }
     ]
     
   
@@ -414,7 +472,7 @@ export default function DiagramCreation() {
         open={modalOpen}
         onOpen={handleOpen}
         onClose={handleClose}
-        trigger={<p><Icon name='plus'/>Add new Daigram</p>}>
+        trigger={<p><Icon name='plus'/>Add new Diagram</p>}>
         <Modal.Header>Add new Daigram</Modal.Header>
         <Modal.Content>
           <Form>
@@ -452,7 +510,7 @@ export default function DiagramCreation() {
               </Form.Field>
               <Form.Field>
   
-                <input type="file" name="sourcefile" onChange={onChangeSourceFile} ref={sourcefileInput} style={{ display: 'none' }} />
+                <input type="file" name="sourcefile" onChange={onChangeSourceFile} ref={sourcefileInput} style={{ display: 'none' }} accept="image/*" />
                 <Button 
                   onClick={() => sourcefileInput.current.click()}
                   content='Choose Source File'
@@ -480,7 +538,7 @@ export default function DiagramCreation() {
           </Form>
         </Modal.Content>
         <Modal.Actions>
-          {/*<Button content='Multi' onClick={handleMulti}/>*/}
+          <Button content='Multi' onClick={handleMulti}/>
           <Button content='Cancel' onClick={handleClose}/>
           <Button primary labelPosition='right' content='Reset' icon='refresh' onClick={handleReset}/>
           <Button positive labelPosition='right' icon='checkmark' content='Save' href='/'

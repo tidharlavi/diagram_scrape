@@ -51,7 +51,8 @@ var productsDict = {
   "kinesis data": "Amazon Kinesis Data Stream",
   "redshift": "Amazon Redshift",
   "athena": "Amazon Athena",
-  "sns": "Amazon Simple Notification Service (SNS)",
+  "sqs": "Amazon Simple Queue Service (SQS)",
+  "amazon sqs": "Amazon Simple Queue Service (SQS)",
   "rekognition": "Amazon Rekognition",
   "rds": "Amazon RDS",
   "glue": "AWS Glue",
@@ -88,7 +89,15 @@ var productsDict = {
   "iam": "AWS IAM",
   "notebook": "Amazon SageMaker Notebook",
   "amplify": "AWS Amplify",
-  "cognito": "Amazon Cognito"
+  "cognito": "Amazon Cognito",
+  "cloud​formation": "AWS Cloud​Formation",
+  "fargate": "AWS Fargate",
+  "codepipeline": "AWS CodePipeline",
+  "Codebuild": "AWS CodeBuild",
+  "ecs": "Amazon ECS",
+  "appsync": "AWS AppSync",
+  "kendra": "Amazon Kendra",
+
 }
 
 

@@ -67,6 +67,7 @@ const contentStyle = css`
 const optionsProduct = [
   { value: 'Amazon EC2', text: 'Amazon EC2', label: 'Amazon EC2' },
   { value: 'Amazon Simple Notification Service (SNS)', text: 'Amazon Simple Notification Service (SNS)', label: 'Amazon Simple Notification Service (SNS)' },
+  { value: 'Amazon Simple Queue Service (SQS)', text: 'Amazon Simple Queue Service (SQS)', label: 'Amazon Simple Queue Service (SQS)' },
   { value: 'AWS Lambda', text: 'AWS Lambda', label: 'AWS Lambda' },
   { value: 'AWS Lake Formation', text: 'AWS Lake Formation', label: 'AWS Lake Formation' },
   { value: 'AWS Glue', text: 'AWS Glue', label: 'AWS Glue' },
@@ -108,7 +109,14 @@ const optionsProduct = [
   { value: 'Amazon Cognito', text: 'Amazon Cognito', label: 'Amazon Cognito' },
   { value: 'AWS Amplify', text: 'AWS Amplify', label: 'AWS Amplify' },
   { value: 'Amazon SageMaker Notebook', text: 'Amazon SageMaker Notebook', label: 'Amazon SageMaker Notebook' },
-  { value: 'AWS IAM', text: 'AWS IAM', label: 'AWS IAM' },
+  { value: 'AWS IAM', text: 'AWS IAM', label: 'AWS IAM' }, 
+  { value: 'AWS Cloud​Formation', text: 'AWS Cloud​Formation', label: 'AWS Cloud​Formation' },
+  { value: 'AWS Fargate', text: 'AWS Fargate', label: 'AWS Fargate' },
+  { value: 'AWS CodePipeline', text: 'AWS CodePipeline', label: 'AWS CodePipeline' },
+  { value: 'AWS CodeBuild', text: 'AWS CodeBuild', label: 'AWS CodeBuild' },
+  { value: 'Amazon ECS', text: 'Amazon ECS', label: 'Amazon ECS' },
+  { value: 'AWS AppSync', text: 'AWS AppSync', label: 'AWS AppSync' }, 
+  { value: 'Amazon Kendra', text: 'Amazon Kendra', label: 'Amazon Kendra' },
 ]
 
 
@@ -346,7 +354,7 @@ function AuthStateApp() {
       setUser(authData);
     });
   }, []);
-  document.title = 'Travel Deals';
+  document.title = 'Architecture Diagram Search';
   return authState === AuthState.SignedIn && user ? (
       <div className='App'>
         <Menu fixed='top' color='teal' inverted>
